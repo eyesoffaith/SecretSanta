@@ -59,7 +59,7 @@ def pair_contact_with_recipient(df_contacts: pl.DataFrame):
         print(f"Unable to find matching pairs after {RETRIES} attempts. Likely not possible")
         return pl.DataFrame()
     else:
-        print(f"Success in {RETRIES - retries} tries")
+        print(f"Success in {RETRIES - retries} attempts")
         df_recipients = pl.DataFrame({"sender": [email for email in contacts], "recipient": [contacts[email]["recipient"] for email in contacts]})
         return df_recipients.join(df_contacts.select(["email", "name"]), left_on="sender", right_on="email")\
             .join(df_contacts.select(["email", "name", "gift_list_link"]), left_on="recipient", right_on="email")\
