@@ -1,6 +1,3 @@
 /data
 *.log
-example.py
-email_credentials
-email_template.html
 gift_pairs.csv
