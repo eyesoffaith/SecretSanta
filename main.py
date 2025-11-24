@@ -115,8 +115,8 @@ def send_emails(df_gift_pairs: pl.DataFrame):
         
         for row in df_gift_pairs.to_dicts():
             # TODO: Switch to row["sender_email"] for actually live use
-            recipient_email = "dmjunkjunk@gmail.com"
-            # recipient_email = row["sender_email"]
+            # recipient_email = "dmjunkjunk@gmail.com"
+            recipient_email = row["sender_email"]
 
             msg_body = email_html
             msg_body = msg_body.replace("[[sender_name]]", row["sender_name"])
