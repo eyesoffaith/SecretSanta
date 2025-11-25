@@ -14,6 +14,11 @@ import pprint as pp
 from cryptography.fernet import Fernet
 
 RETRIES = 100
+TEST_RUN = True
+TEST_EMAIL = "dmjunkjunk@gmail.com"
+TEST_MODE = "test"
+LIVE_MODE = "live"
+
 with open("data/encryption.key", "rb") as key_file:
     ENCRYPTION_KEY = key_file.read()
 
@@ -114,10 +119,11 @@ def send_emails(df_gift_pairs: pl.DataFrame):
         smtp_server.login(GMAIL_USERNAME, GMAIL_APP_PASSWORD)
         
         for row in df_gift_pairs.to_dicts():
-            # TODO: Switch to row["sender_email"] for actually live use
-            # recipient_email = "dmjunkjunk@gmail.com"
-            recipient_email = row["sender_email"]
-
+            if TEST_RUN:
+                recipient_email = "dmjunkjunk@gmail.com"
+            else:
+                recipient_email = row["sender_email"]
+            
             msg_body = email_html
             msg_body = msg_body.replace("[[sender_name]]", row["sender_name"])
             msg_body = msg_body.replace("[[recipient_name]]", row["recipient_name"])
@@ -129,7 +135,7 @@ def send_emails(df_gift_pairs: pl.DataFrame):
             msg["To"] = recipient_email
 
             smtp_server.sendmail(GMAIL_USERNAME, [recipient_email], msg.as_string())
-            print(f"Message Sent to {recipient_email}")
+            print(f"Message sent to {recipient_email}")
 
 def main():
     contact_files = [[os.path.getmtime(file_path), file_path] for file_path in glob.glob("data/*_contacts.csv")]
@@ -157,4 +163,16 @@ def main():
     df_new_contacts.write_csv(f"data/{year + 1}_contacts.csv")
 
 if __name__ == "__main__":
+    execution_mode = None
+    if len(sys.argv) > 1:
+        execution_mode = sys.argv[1]
+
+    if execution_mode == TEST_MODE:
+        TEST_RUN = True
+    elif execution_mode == LIVE_MODE:
+        TEST_RUN = False
+    else:
+        print(f"Unknown execution mode {execution_mode}. Valid modes are [{TEST_MODE},{LIVE_MODE}]")
+        sys.exit()
+
     main()
